@@ -1,122 +1,287 @@
-# 🧠 SPECTRA — Architecture Rules & Enforcement Contract
+# SPECTRA Architecture Rules
 
-> **Status:** Authoritative  
-> **Applies To:** All contributors  
-> **Last Modified:** Phase 1  
-> **Owner:** System Architecture (M1)
-
----
-
-## 📌 Document Purpose
-
-This document defines **non-negotiable architectural rules** for the **SPECTRA** system.
-
-Its purpose is to:
-
-- Prevent architectural drift  
-- Eliminate cross-layer contamination  
-- Ensure clean packaging into a single executable  
-- Guarantee long-term maintainability  
-
-⚠️ **Any violation of these rules is considered a blocking defect.**
+Status: Authoritative  
+Audience: All developers  
+Scope: Entire system architecture
 
 ---
 
-## 🏗️ 1. Architectural Philosophy
+## 1. Purpose of This Document
 
-SPECTRA follows a **strict layered architecture**.
+This document defines the mandatory architectural rules for the SPECTRA software system.
+
+Its objectives are to:
+- Enforce clean separation of concerns
+- Prevent cross-layer coupling
+- Ensure deterministic behavior
+- Enable reliable packaging into a single executable
+- Maintain long-term maintainability and extensibility
+
+Any violation of these rules is considered a blocking architectural defect.
+
+---
+
+## 2. Architectural Philosophy
+
+SPECTRA follows a strictly layered architecture.
 
 Each layer has:
+- A single, well-defined responsibility
+- Explicitly allowed dependencies
+- Explicitly forbidden dependencies
 
-- A **single responsibility**
-- Explicit **allowed dependencies**
-- Explicit **forbidden dependencies**
+No layer may assume internal behavior of another layer.
+Communication between layers must occur only through defined contracts.
 
-> **Rule:**  
-> If code does not clearly belong to one layer, it must not exist.
-
----
-
-## 🧩 2. Top-Level Layer Definitions
+If a piece of code does not clearly belong to one layer, it must not exist.
 
 ---
 
-### 🎨 2.1 Frontend Layer (`frontend/`)
+## 3. System Layers Overview
 
-**Purpose**
-- User interaction
-- File upload
-- Visualization of AI output
-- Report download
+The system is composed of the following layers:
 
-**Allowed Technologies**
-- Electron  
-- React  
-- JavaScript / TypeScript  
-- HTML / CSS  
+- Frontend layer
+- Backend layer
+- Model artifact layer
+- Data layer
+- Training and experimentation layer
+- Documentation layer
 
-**Allowed Actions**
-- Send HTTP requests to backend
-- Render images and PDFs
-- Display error messages
-- Handle UI state
-
-**Explicitly Forbidden**
-- ❌ AI model loading  
-- ❌ PyTorch / MONAI / NumPy  
-- ❌ Medical preprocessing logic  
-- ❌ Direct filesystem access to datasets  
-- ❌ Training or inference logic  
-
-> 🔒 **Rule:**  
-> The frontend must be completely **AI-agnostic**.
+Each layer is enforced by directory boundaries.
 
 ---
 
-### ⚙️ 2.2 Backend Layer (`backend/`)
+## 4. Frontend Layer
 
-**Purpose**
+Directory:
+frontend/
+
+### Responsibility
+The frontend layer is responsible only for user interaction and visualization.
+
+It handles:
+- File selection and upload
+- Display of results
+- Display of error messages
+- Download of generated reports
+
+### Allowed Dependencies
+- Electron
+- React
+- JavaScript or TypeScript
+- HTML and CSS
+- HTTP client libraries
+
+### Forbidden Dependencies
+- AI or machine learning libraries
+- Python code
+- Medical preprocessing logic
+- Dataset access
+- Model loading or inference
+- Training logic
+
+Rule:
+The frontend must remain completely unaware of model internals and medical logic.
+
+---
+
+## 5. Backend Layer
+
+Directory:
+backend/
+
+### Responsibility
+The backend layer is responsible for all computation and orchestration.
+
+It handles:
+- Input validation
 - Input normalization
-- AI model orchestration
+- Model routing
 - Inference execution
 - Post-processing
 - Report generation
 
-**Allowed Technologies**
-- Python  
-- FastAPI  
-- PyTorch (**inference only**)  
-- MONAI (**inference only**)  
-- NumPy / OpenCV  
-- Report generation libraries  
+### Allowed Dependencies
+- Python
+- FastAPI
+- PyTorch (inference only)
+- MONAI (inference only)
+- Numerical and image processing libraries
 
-**Allowed Actions**
-- Load trained `.pt` models
-- Run deterministic preprocessing
-- Perform inference
-- Generate overlays and reports
-- Return structured JSON responses
+### Forbidden Dependencies
+- Training code
+- Dataset download logic
+- Randomized preprocessing at runtime
+- Frontend rendering logic
+- Notebook execution
 
-**Explicitly Forbidden**
-- ❌ Model training loops  
-- ❌ Dataset downloading  
-- ❌ Randomized preprocessing at inference  
-- ❌ UI rendering logic  
-- ❌ Frontend framework code  
-
-> 🔒 **Rule:**  
-> Backend = **pure computation and orchestration**, never training or UI.
+Rule:
+The backend must never train models or depend on training utilities.
 
 ---
 
-### 🧠 2.3 Model Artifacts (`models/`)
+## 6. Model Artifact Layer
 
-**Purpose**
-- Store **trained, frozen model weights only**
+Directory:
+models/
 
-**Allowed Files**
-```text
-gatekeeper.pt
-brain.pt
-chest.pt
-bone.pt
+### Responsibility
+The model artifact layer stores trained, frozen model weights used at runtime.
+
+### Allowed Contents
+- gatekeeper.pt
+- brain.pt
+- chest.pt
+- bone.pt
+
+### Rules
+- Models must be trained externally
+- Models must be immutable during runtime
+- Models must be loaded in inference mode only
+
+### Forbidden Contents
+- Raw datasets
+- Training scripts
+- Optimizer states
+- Intermediate checkpoints
+
+---
+
+## 7. Data Layer
+
+Directory:
+data/
+
+### 7.1 Raw Data
+
+Directory:
+data/raw/
+
+Purpose:
+Temporary local storage of original datasets.
+
+Rules:
+- Must never be committed to version control
+- Must never be accessed by runtime backend
+- Exists only on local machines or external storage
+
+---
+
+### 7.2 Processed Data
+
+Directory:
+data/processed/
+
+Purpose:
+Deterministic preprocessing outputs used for training and validation.
+
+Rules:
+- Must exactly match inference preprocessing logic
+- May contain small representative samples
+- Large datasets must remain external
+
+---
+
+## 8. Training and Experimentation Layer
+
+Directories:
+- notebooks/
+- scripts/
+
+### Responsibility
+This layer exists only for training, experimentation, and validation.
+
+It includes:
+- Google Colab notebooks
+- Training scripts
+- Dataset analysis tools
+
+Rules:
+- Must never be imported by backend runtime code
+- Must never be required for application execution
+- Changes here must not affect runtime behavior
+
+---
+
+## 9. Reporting Layer
+
+Directory:
+reports/
+
+### Responsibility
+Stores generated output artifacts.
+
+Includes:
+- PDF reports
+- Annotated images
+- Temporary inference outputs
+
+Rules:
+- Generated at runtime only
+- Safe to delete and regenerate
+- Must not contain source code or logic
+
+---
+
+## 10. Documentation Layer
+
+Directory:
+docs/
+
+### Responsibility
+Defines system contracts and methodology.
+
+Required documents include:
+- architecture_rules.md
+- api_contract.md
+- folder_responsibility.md
+
+Rules:
+- Documentation must be kept consistent with implementation
+- Architectural changes require documentation updates first
+
+---
+
+## 11. Determinism and Reproducibility
+
+The system must satisfy the following:
+
+- Inference must be deterministic
+- Preprocessing must be identical between training and inference
+- No random behavior is allowed at runtime
+- Any randomness during training must be seed-controlled
+
+---
+
+## 12. Packaging Rules
+
+- The final deliverable must be a single executable file
+- End users must not install Python, Node.js, or CUDA
+- Backend services must be bundled within the desktop application
+- All runtime dependencies must be packaged explicitly
+
+---
+
+## 13. Enforcement Rules
+
+- No datasets in version control
+- No training code in backend
+- No AI logic in frontend
+- No cross-layer imports
+- No secrets or credentials in the repository
+
+Violations require immediate rollback and architectural review.
+
+---
+
+## 14. Final Enforcement Statement
+
+If a file, module, or dependency does not clearly belong to a single layer,
+it must be removed or redesigned.
+
+Architecture clarity takes precedence over convenience.
+
+---
+
+End of Document

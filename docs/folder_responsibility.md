@@ -1,193 +1,240 @@
----
+# SPECTRA Folder Responsibility Contract
 
-# 📁 `folder_responsibility.md`
-
-```md
-# 📁 SPECTRA — Folder Responsibility Contract
-
-> **Status:** Authoritative  
-> **Audience:** All Developers  
-> **Purpose:** Prevent misuse of directories
+Status: Authoritative  
+Audience: All developers  
+Scope: Entire repository
 
 ---
 
-## 📌 Why This Document Exists
+## 1. Purpose of This Document
 
-This document defines **what each folder is allowed and forbidden to contain**.
+This document defines the allowed and forbidden contents of every folder in the SPECTRA repository.
 
-Violating these rules causes:
-- Build failures
-- Packaging issues
-- Runtime bugs
-- Long-term technical debt
+Its purpose is to:
+- Prevent architectural violations
+- Avoid cross-layer coupling
+- Ensure clean packaging into a single executable
+- Maintain long-term maintainability
+
+Any deviation from these rules is considered a blocking architectural defect.
 
 ---
 
-## 🗂️ Root Structure Overview
+## 2. Repository Root Structure
+
+The repository must follow this structure exactly:
 
 spectra-ai/
-├── backend/
-├── frontend/
-├── models/
-├── data/
-│ ├── raw/
-│ └── processed/
-├── scripts/
-├── notebooks/
-├── reports/
-├── docs/
+- backend/
+- frontend/
+- models/
+- data/
+  - raw/
+  - processed/
+- scripts/
+- notebooks/
+- reports/
+- docs/
 
-yaml
-Copy code
-
----
-
-## ⚙️ `backend/`
-
-### Purpose
-- Runtime inference engine
-- FastAPI server
-- Preprocessing & orchestration
-
-### Allowed
-- API routes
-- Inference logic
-- Deterministic preprocessing
-- Model loading
-
-### Forbidden
-- ❌ Training code
-- ❌ Dataset downloads
-- ❌ UI logic
-- ❌ Random augmentations
+No additional top-level folders may be introduced without architectural review.
 
 ---
 
-## 🎨 `frontend/`
+## 3. backend/
 
 ### Purpose
-- Desktop UI
+The backend folder contains the runtime inference engine.
+
+It is responsible for:
+- Input normalization
+- Model orchestration
+- Inference execution
+- Post-processing
+- Report generation
+
+### Allowed Contents
+- FastAPI application code
+- Inference-only PyTorch code
+- Deterministic preprocessing logic
+- Model loading logic
+- PDF and overlay generation code
+
+### Forbidden Contents
+- Training loops
+- Dataset download logic
+- Random data augmentation
+- Frontend or UI code
+- Notebook files
+- Experimental scripts
+
+Rule:
+The backend must never perform training or depend on training utilities.
+
+---
+
+## 4. frontend/
+
+### Purpose
+The frontend folder contains the desktop user interface.
+
+It is responsible for:
+- File upload
 - User interaction
-- Visualization
+- Displaying results
+- Downloading reports
 
-### Allowed
-- Electron main process
+### Allowed Contents
+- Electron main process code
 - React components
-- API calls
-- Image/PDF rendering
+- UI state management
+- API request logic
+- Image and PDF rendering
 
-### Forbidden
-- ❌ AI logic
-- ❌ Python code
-- ❌ Model weights
-- ❌ Medical preprocessing
+### Forbidden Contents
+- AI models
+- Python code
+- Medical preprocessing
+- Dataset access
+- Training or inference logic
+
+Rule:
+The frontend must remain completely AI-agnostic.
 
 ---
 
-## 🧠 `models/`
+## 5. models/
 
 ### Purpose
-- Store trained model artifacts
+The models folder stores trained, frozen model weights used at runtime.
 
-### Allowed
-```text
-gatekeeper.pt
-brain.pt
-chest.pt
-bone.pt
-Forbidden
-❌ Training checkpoints
+### Allowed Contents
+- gatekeeper.pt
+- brain.pt
+- chest.pt
+- bone.pt
 
-❌ Optimizer states
+### Rules
+- Models must be trained externally
+- Models must be immutable at runtime
+- Models must be versioned intentionally
 
-❌ Raw data
+### Forbidden Contents
+- Raw datasets
+- Training scripts
+- Optimizer states
+- Intermediate checkpoints
 
-❌ Scripts
+---
 
-📊 data/raw/
-Purpose
-Temporary local dataset storage
+## 6. data/
 
-Rules
-❌ Never committed
+### 6.1 data/raw/
 
-❌ Never accessed at runtime
+Purpose:
+Temporary local storage of original datasets.
 
-❌ Exists only locally
+Rules:
+- Must never be committed to Git
+- Must never be accessed by runtime backend
+- Exists only on developer machines or external storage
 
-📈 data/processed/
-Purpose
-Deterministic preprocessing outputs
+---
 
-Validation samples
+### 6.2 data/processed/
 
-Rules
-Must mirror inference preprocessing
+Purpose:
+Deterministic preprocessing outputs used for training validation and testing.
 
-Large files stay external
+Rules:
+- Must exactly match inference preprocessing
+- May contain small representative samples
+- Large datasets must remain external
 
-🛠️ scripts/
-Purpose
-One-time utilities
+---
 
-Dataset conversion
+## 7. scripts/
 
-Validation helpers
+### Purpose
+One-off utilities and helper scripts.
 
-Rules
-❌ Never imported by backend
+Examples:
+- Dataset conversion
+- Validation scripts
+- Preprocessing verification tools
 
-❌ Never required at runtime
+Rules:
+- Must never be imported by backend runtime
+- Must never be required for application execution
 
-📓 notebooks/
-Purpose
-Model training
+---
 
-Google Colab workflows
+## 8. notebooks/
 
-Rules
-Training only
+### Purpose
+Training and experimentation workflows.
 
-Experimental allowed
+Examples:
+- Google Colab notebooks
+- Model training notebooks
+- Data exploration notebooks
 
-❌ No runtime dependency
+Rules:
+- Training only
+- Experimental code allowed
+- Must never be used at runtime
 
-📄 reports/
-Purpose
-Generated outputs
+---
 
-PDFs and overlays
+## 9. reports/
 
-Rules
-Runtime-generated only
+### Purpose
+Generated output artifacts.
 
-Safe to delete
+Examples:
+- PDF clinical reports
+- Annotated images
 
-Never committed long-term
+Rules:
+- Generated at runtime only
+- Safe to delete and regenerate
+- Not part of core logic
 
-📚 docs/
-Purpose
-Architecture
+---
 
-Contracts
+## 10. docs/
 
-Methodology
+### Purpose
+Project documentation and contracts.
 
-Required Files
-architecture_rules.md
+Required documents:
+- architecture_rules.md
+- api_contract.md
+- folder_responsibility.md
 
-api_contract.md
+Rules:
+- Documentation must reflect current architecture
+- Any architectural change must update documentation first
 
-folder_responsibility.md
+---
 
-🚫 Absolute Rules
-❌ No datasets in Git
+## 11. Absolute Repository Rules
 
-❌ No training in backend
+- No datasets in Git
+- No training code in backend
+- No AI logic in frontend
+- No cross-layer imports
+- No credentials or secrets in repository
 
-❌ No AI in frontend
+Violations require immediate rollback and review.
 
-❌ No cross-layer imports
+---
 
-✅ Final Enforcement Rule
-If a folder’s purpose is unclear, STOP and document before coding.
+## 12. Final Enforcement Rule
+
+If a file does not clearly belong to one folder, it does not belong anywhere.
+
+Stop and redesign before proceeding.
+
+---
+
+End of Document
