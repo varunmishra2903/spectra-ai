@@ -1,18 +1,16 @@
-# ============================================================
-# ENVIRONMENT SETUP — S.P.E.C.T.R.A.
-# ============================================================
-# PURPOSE:
-# - Deterministic development
-# - Reproducible AI training
-# - Stable backend inference
-# - Reliable desktop packaging
-# ============================================================
+## ENVIRONMENT SETUP — S.P.E.C.T.R.A.
+## PURPOSE:
+## - Deterministic development
+## - Reproducible AI training
+## - Stable backend inference
+## - Reliable desktop packaging
+---
 
 environment_setup:
 
-  # ----------------------------------------------------------
-  # PROJECT METADATA
-  # ----------------------------------------------------------
+  ---
+  ## PROJECT METADATA
+  ---
   project_name: SPECTRA
 
   purpose:
@@ -21,9 +19,9 @@ environment_setup:
     - stable_backend_inference
     - reliable_desktop_packaging
 
-  # ----------------------------------------------------------
-  # SUPPORTED OPERATING SYSTEMS
-  # ----------------------------------------------------------
+  ---
+  ## SUPPORTED OPERATING SYSTEMS
+  ---
   supported_operating_systems:
 
     development:
@@ -36,9 +34,9 @@ environment_setup:
       - windows_10_64bit
       - windows_11_64bit
 
-  # ----------------------------------------------------------
-  # GLOBAL TOOLCHAIN REQUIREMENTS
-  # ----------------------------------------------------------
+  ---
+  ## GLOBAL TOOLCHAIN REQUIREMENTS
+  ---
   global_toolchain:
 
     python:
@@ -60,9 +58,9 @@ environment_setup:
       - npm --version
       - git --version
 
-  # ----------------------------------------------------------
-  # BACKEND RUNTIME ENVIRONMENT (FASTAPI + INFERENCE)
-  # ----------------------------------------------------------
+  ---
+  ## BACKEND RUNTIME ENVIRONMENT (FASTAPI + INFERENCE)
+  ---
   backend_environment:
 
     purpose:
@@ -103,9 +101,9 @@ environment_setup:
       - nibabel
       - reportlab
 
-  # ----------------------------------------------------------
-  # FRONTEND DEVELOPMENT ENVIRONMENT (ELECTRON + REACT)
-  # ----------------------------------------------------------
+  ---
+  ## FRONTEND DEVELOPMENT ENVIRONMENT (ELECTRON + REACT)
+  ---
   frontend_environment:
 
     purpose:
@@ -126,9 +124,9 @@ environment_setup:
 
     validation_command: npm run dev
 
-  # ----------------------------------------------------------
-  # TRAINING ENVIRONMENT (AI MODEL DEVELOPMENT)
-  # ----------------------------------------------------------
+  ---
+  ## TRAINING ENVIRONMENT (AI MODEL DEVELOPMENT)
+  ---
   training_environment:
 
     platform: google_colab
@@ -149,9 +147,9 @@ environment_setup:
       example_path: /content/drive/MyDrive/DATASETS/SPECTRA
       copy_into_repo: false
 
-  # ----------------------------------------------------------
-  # DATA STORAGE RULES
-  # ----------------------------------------------------------
+  ---
+  ## DATA STORAGE RULES
+  ---
   data_storage_rules:
 
     repository:
@@ -166,9 +164,9 @@ environment_setup:
         - cloud_storage
       documentation_required: true
 
-  # ----------------------------------------------------------
-  # MODEL ARTIFACT HANDLING
-  # ----------------------------------------------------------
+  ---
+  ## MODEL ARTIFACT HANDLING
+  ---
   model_artifacts:
 
     training_output_formats:
@@ -181,9 +179,9 @@ environment_setup:
       location: models/
       included_during_packaging: true
 
-  # ----------------------------------------------------------
-  # PACKAGING CONSTRAINTS
-  # ----------------------------------------------------------
+  ---
+  ## PACKAGING CONSTRAINTS
+  ---
   packaging_constraints:
 
     backend_environment_only: true
@@ -191,9 +189,9 @@ environment_setup:
     unused_dependencies_allowed: false
     path_policy: relative_only
 
-  # ----------------------------------------------------------
-  # COMPLIANCE & GOVERNANCE
-  # ----------------------------------------------------------
+  ---
+  ## COMPLIANCE & GOVERNANCE
+  ---
   compliance:
 
     deviation_allowed: false
