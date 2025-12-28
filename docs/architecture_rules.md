@@ -283,5 +283,3 @@ it must be removed or redesigned.
 Architecture clarity takes precedence over convenience.
 
 ---
-
-End of Document

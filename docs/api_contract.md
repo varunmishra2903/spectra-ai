@@ -284,5 +284,3 @@ the backend interpretation is authoritative.
 Frontend logic must adapt to the backend, not the reverse.
 
 ---
-
-End of Document

@@ -236,5 +236,3 @@ If a file does not clearly belong to one folder, it does not belong anywhere.
 Stop and redesign before proceeding.
 
 ---
-
-End of Document
