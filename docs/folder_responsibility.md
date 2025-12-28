@@ -1,165 +1,193 @@
-
 ---
 
-## 📄 `folder_responsibility.md`
+# 📁 `folder_responsibility.md`
 
 ```md
 # 📁 SPECTRA — Folder Responsibility Contract
 
-> **Status:** Locked  
-> **Purpose:** Prevent cross-layer contamination  
-> **Applies To:** Entire repository
+> **Status:** Authoritative  
+> **Audience:** All Developers  
+> **Purpose:** Prevent misuse of directories
 
 ---
 
-## 📌 Overview
+## 📌 Why This Document Exists
 
-This document defines **exact ownership, allowed content, and forbidden content** for every top-level folder in the SPECTRA repository.
+This document defines **what each folder is allowed and forbidden to contain**.
 
-Any violation is considered an **architectural defect**.
+Violating these rules causes:
+- Build failures
+- Packaging issues
+- Runtime bugs
+- Long-term technical debt
 
 ---
 
-## 🧩 Root-Level Folders
+## 🗂️ Root Structure Overview
+
+spectra-ai/
+├── backend/
+├── frontend/
+├── models/
+├── data/
+│ ├── raw/
+│ └── processed/
+├── scripts/
+├── notebooks/
+├── reports/
+├── docs/
+
+yaml
+Copy code
 
 ---
 
-### 📂 `backend/`
+## ⚙️ `backend/`
 
-**Responsibility**
-- All backend computation and orchestration
+### Purpose
+- Runtime inference engine
+- FastAPI server
+- Preprocessing & orchestration
 
-**Contains**
-- FastAPI app
-- Inference pipelines
-- Preprocessing logic
+### Allowed
+- API routes
+- Inference logic
+- Deterministic preprocessing
 - Model loading
-- Report generation
 
-**Must NOT Contain**
-- Frontend code
-- Training loops
-- Dataset downloads
-- Experiment notebooks
+### Forbidden
+- ❌ Training code
+- ❌ Dataset downloads
+- ❌ UI logic
+- ❌ Random augmentations
 
 ---
 
-### 📂 `frontend/`
+## 🎨 `frontend/`
 
-**Responsibility**
-- Desktop UI (Electron + React)
+### Purpose
+- Desktop UI
+- User interaction
+- Visualization
 
-**Contains**
-- UI components
+### Allowed
+- Electron main process
+- React components
 - API calls
-- Visualization logic
+- Image/PDF rendering
 
-**Must NOT Contain**
-- AI models
-- Python code
-- Medical preprocessing
-- File system logic
-
----
-
-### 📂 `models/`
-
-**Responsibility**
-- Frozen, trained model artifacts
-
-**Contains**
-- `gatekeeper.pt`
-- `brain.pt`
-- `chest.pt`
-- `bone.pt`
-
-**Must NOT Contain**
-- Training code
-- Datasets
-- Temporary checkpoints
+### Forbidden
+- ❌ AI logic
+- ❌ Python code
+- ❌ Model weights
+- ❌ Medical preprocessing
 
 ---
 
-### 📂 `data/`
+## 🧠 `models/`
 
-#### `data/raw/`
-- Local datasets only
-- Never committed
-- Never used at runtime
+### Purpose
+- Store trained model artifacts
 
-#### `data/processed/`
-- Deterministic preprocessing outputs
-- Matches inference preprocessing
-- Small samples allowed
+### Allowed
+```text
+gatekeeper.pt
+brain.pt
+chest.pt
+bone.pt
+Forbidden
+❌ Training checkpoints
 
----
+❌ Optimizer states
 
-### 📂 `scripts/`
+❌ Raw data
 
-**Responsibility**
-- Utility scripts
-- Dataset conversion
-- Validation helpers
+❌ Scripts
 
-**Rules**
-- Never imported by backend runtime
+📊 data/raw/
+Purpose
+Temporary local dataset storage
 
----
+Rules
+❌ Never committed
 
-### 📂 `notebooks/`
+❌ Never accessed at runtime
 
-**Responsibility**
-- Training & experimentation
-- Google Colab workflows
+❌ Exists only locally
 
-**Rules**
-- Offline / research only
-- No runtime dependency
+📈 data/processed/
+Purpose
+Deterministic preprocessing outputs
 
----
+Validation samples
 
-### 📂 `reports/`
+Rules
+Must mirror inference preprocessing
 
-**Responsibility**
-- Generated outputs
-- PDFs
-- Annotated images
+Large files stay external
 
-**Rules**
-- Safe to delete
-- Generated dynamically
+🛠️ scripts/
+Purpose
+One-time utilities
 
----
+Dataset conversion
 
-### 📂 `docs/`
+Validation helpers
 
-**Responsibility**
-- System documentation
+Rules
+❌ Never imported by backend
 
-**Contains**
-- Architecture rules
-- API contracts
-- Data manifests
-- Methodology
+❌ Never required at runtime
 
----
+📓 notebooks/
+Purpose
+Model training
 
-## 🔒 Global Enforcement Rules
+Google Colab workflows
 
-- ❌ No dataset files in Git
-- ❌ No training inside backend
-- ❌ No inference inside frontend
-- ✅ `.gitkeep` allowed for empty folders
+Rules
+Training only
 
----
+Experimental allowed
 
-## ✅ Verification Checklist
+❌ No runtime dependency
 
-Before pushing code, ask:
-- Does this file belong here?
-- Is this folder allowed to know about this logic?
-- Would moving this break a rule?
+📄 reports/
+Purpose
+Generated outputs
 
-If unsure → **STOP and redesign**.
+PDFs and overlays
 
----
+Rules
+Runtime-generated only
+
+Safe to delete
+
+Never committed long-term
+
+📚 docs/
+Purpose
+Architecture
+
+Contracts
+
+Methodology
+
+Required Files
+architecture_rules.md
+
+api_contract.md
+
+folder_responsibility.md
+
+🚫 Absolute Rules
+❌ No datasets in Git
+
+❌ No training in backend
+
+❌ No AI in frontend
+
+❌ No cross-layer imports
+
+✅ Final Enforcement Rule
+If a folder’s purpose is unclear, STOP and document before coding.
